@@ -1,0 +1,21 @@
+# Tasks
+
+- [x] Project Setup & Core Logic [/]
+    - [x] Initialize WPF Project structure
+    - [x] Implement `TaskEntry` model
+    - [x] Implement `TaskService` for text file persistence
+- [x] ViewModel Implementation [ ]
+    - [x] Create `MainViewModel` with `INotifyPropertyChanged`
+    - [x] Implement Task Tracking timer logic (Start, Pause, Stop)
+    - [x] Implement Pomodoro timer logic (Countdown, Sound)
+    - [x] Implement command logic for all buttons
+- [x] UI Design [/]
+    - [x] Create main layout in `MainWindow.xaml`
+    - [x] Design Task Tracker section (hh:mm:ss display)
+    - [x] Design Pomodoro section (config + controls)
+    - [x] Design Calendar section (historical view)
+- [x] Verification [ ]
+    - [x] Test timer accuracy
+    - [x] Verify file persistence (readable text)
+    - [x] Test Pomodoro sound notification
+    - [x] Verify calendar highlighting

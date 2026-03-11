@@ -1,0 +1,140 @@
+<Window x:Class="PishpanTimeTracker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PishpanTimeTracker"
+        xmlns:viewmodels="clr-namespace:PishpanTimeTracker.ViewModels"
+        xmlns:converters="clr-namespace:PishpanTimeTracker.Converters"
+        mc:Ignorable="d"
+        Title="Pishpan Time Tracker" Height="600" Width="950"
+        Background="#121212" Foreground="White" FontFamily="Segoe UI">
+    <Window.DataContext>
+        <viewmodels:MainViewModel/>
+    </Window.DataContext>
+    <Window.Resources>
+        <converters:DateToHighlightConverter x:Key="DateToHighlightConverter"/>
+        <converters:FileNameConverter x:Key="FileNameConverter"/>
+        
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#1e1e1e"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="15,8"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#333333"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="CalendarDayButtonStyle" TargetType="CalendarDayButton">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CalendarDayButton">
+                        <Grid>
+                            <Border x:Name="HighlightBorder" Background="Transparent" CornerRadius="2" Margin="2"/>
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Grid>
+                        <ControlTemplate.Triggers>
+                            <DataTrigger Value="True">
+                                <DataTrigger.Binding>
+                                    <MultiBinding Converter="{StaticResource DateToHighlightConverter}">
+                                        <Binding Path="Date"/>
+                                        <Binding Path="DataContext.HighlightedDays" RelativeSource="{RelativeSource AncestorType=Calendar}"/>
+                                    </MultiBinding>
+                                </DataTrigger.Binding>
+                                <Setter TargetName="HighlightBorder" Property="Background" Value="#42a5f5"/>
+                                <Setter Property="Foreground" Value="White"/>
+                            </DataTrigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="20">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Left Section: Timers -->
+        <StackPanel Grid.Column="0">
+            <!-- Daily Task Tracker -->
+            <Border Background="#1e1e1e" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+                <StackPanel>
+                    <TextBlock Text="Current Task" FontSize="18" Foreground="#888888" Margin="0,0,0,10"/>
+                    <TextBlock Text="{Binding TaskTimeFormatted}" FontSize="72" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="Start" Command="{Binding StartTaskCommand}" Width="100" Background="#43a047"/>
+                        <Button Content="Pause" Command="{Binding PauseTaskCommand}" Width="100" Background="#fb8c00"/>
+                        <Button Content="Stop" Command="{Binding StopTaskCommand}" Width="100" Background="#e53935"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Pomodoro Section -->
+            <Border Background="#1e1e1e" CornerRadius="8" Padding="20">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <StackPanel Grid.Column="0">
+                        <TextBlock Text="Pomodoro" FontSize="18" Foreground="#888888" Margin="0,0,0,10"/>
+                        <TextBlock Text="{Binding PomodoroTimeFormatted}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10"/>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="Start Pomodoro" Command="{Binding StartPomodoroCommand}" Width="150" Background="#1e88e5"/>
+                            <Button Content="Stop" Command="{Binding StopPomodoroCommand}" Width="100" Background="#e53935"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="1" Margin="20,0,0,0" Width="200">
+                        <TextBlock Text="Duration (min)" Foreground="#888888" Margin="0,0,0,5"/>
+                        <TextBox Text="{Binding PomodoroDurationMinutes, UpdateSourceTrigger=PropertyChanged}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,0,15"/>
+                        
+                        <TextBlock Text="Sound" Foreground="#888888" Margin="0,0,0,5"/>
+                        <ComboBox ItemsSource="{Binding AvailableSounds}" SelectedItem="{Binding SelectedSoundPath}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource FileNameConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </StackPanel>
+
+        <!-- Right Section: Calendar -->
+        <Border Grid.Column="1" Background="#1e1e1e" CornerRadius="8" Padding="10" Margin="20,0,0,0">
+            <StackPanel>
+                <TextBlock Text="Activity Overview" FontSize="18" Foreground="#888888" Margin="10,0,0,10"/>
+                <Calendar CalendarDayButtonStyle="{StaticResource CalendarDayButtonStyle}" Background="Transparent" Foreground="White" BorderThickness="0">
+                    <Calendar.Resources>
+                        <Style TargetType="CalendarItem">
+                            <Setter Property="Background" Value="Transparent"/>
+                        </Style>
+                    </Calendar.Resources>
+                </Calendar>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>
