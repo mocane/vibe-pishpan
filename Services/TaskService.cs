@@ -52,5 +52,11 @@ namespace PishpanTimeTracker.Services
             var lines = allEntries.Select(e => e.ToString());
             File.WriteAllLines(_filePath, lines);
         }
+
+        public int GetDaysWorkedInMonth(int year, int month)
+        {
+            var allEntries = LoadAll();
+            return allEntries.Count(e => e.Date.Year == year && e.Date.Month == month && e.TotalTime > TimeSpan.Zero);
+        }
     }
 }

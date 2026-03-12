@@ -7,13 +7,12 @@
         xmlns:viewmodels="clr-namespace:PishpanTimeTracker.ViewModels"
         xmlns:converters="clr-namespace:PishpanTimeTracker.Converters"
         mc:Ignorable="d"
-        Title="Pishpan Time Tracker" Height="600" Width="950"
+        Title="Pishpan Time Tracker" Height="600" Width="800"
         Background="#121212" Foreground="White" FontFamily="Segoe UI">
     <Window.DataContext>
         <viewmodels:MainViewModel/>
     </Window.DataContext>
     <Window.Resources>
-        <converters:DateToHighlightConverter x:Key="DateToHighlightConverter"/>
         <converters:FileNameConverter x:Key="FileNameConverter"/>
         
         <Style TargetType="Button">
@@ -41,37 +40,12 @@
                 </Trigger>
             </Style.Triggers>
         </Style>
-
-        <Style x:Key="CalendarDayButtonStyle" TargetType="CalendarDayButton">
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="CalendarDayButton">
-                        <Grid>
-                            <Border x:Name="HighlightBorder" Background="Transparent" CornerRadius="2" Margin="2"/>
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Grid>
-                        <ControlTemplate.Triggers>
-                            <DataTrigger Value="True">
-                                <DataTrigger.Binding>
-                                    <MultiBinding Converter="{StaticResource DateToHighlightConverter}">
-                                        <Binding Path="Date"/>
-                                        <Binding Path="DataContext.HighlightedDays" RelativeSource="{RelativeSource AncestorType=Calendar}"/>
-                                    </MultiBinding>
-                                </DataTrigger.Binding>
-                                <Setter TargetName="HighlightBorder" Property="Background" Value="#42a5f5"/>
-                                <Setter Property="Foreground" Value="White"/>
-                            </DataTrigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </Window.Resources>
 
     <Grid Margin="20">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="250"/>
         </Grid.ColumnDefinitions>
 
         <!-- Left Section: Timers -->
@@ -81,10 +55,24 @@
                 <StackPanel>
                     <TextBlock Text="Current Task" FontSize="18" Foreground="#888888" Margin="0,0,0,10"/>
                     <TextBlock Text="{Binding TaskTimeFormatted}" FontSize="72" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10"/>
+                    <TextBlock Text="{Binding WorkdayFinishTimeFormatted}" FontSize="16" Foreground="#42a5f5" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                    
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
+                        <Button Content="Start" Command="{Binding StartTaskCommand}" Width="120" Background="#43a047"/>
+                        <Button Content="Stop" Command="{Binding StopTaskCommand}" Width="120" Background="#e53935"/>
+                    </StackPanel>
+
+                    <Separator Background="#333333" Margin="0,10"/>
+                    
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <Button Content="Start" Command="{Binding StartTaskCommand}" Width="100" Background="#43a047"/>
-                        <Button Content="Pause" Command="{Binding PauseTaskCommand}" Width="100" Background="#fb8c00"/>
-                        <Button Content="Stop" Command="{Binding StopTaskCommand}" Width="100" Background="#e53935"/>
+                        <TextBlock Text="Workday Sound" Foreground="#888888" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                        <ComboBox ItemsSource="{Binding AvailableSounds}" SelectedItem="{Binding SelectedWorkdaySoundPath}" Width="200" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Converter={StaticResource FileNameConverter}}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
                     </StackPanel>
                 </StackPanel>
             </Border>
@@ -123,17 +111,23 @@
             </Border>
         </StackPanel>
 
-        <!-- Right Section: Calendar -->
-        <Border Grid.Column="1" Background="#1e1e1e" CornerRadius="8" Padding="10" Margin="20,0,0,0">
+        <!-- Right Section: Statistics -->
+        <Border Grid.Column="1" Background="#1e1e1e" CornerRadius="8" Padding="20" Margin="20,0,0,0">
             <StackPanel>
-                <TextBlock Text="Activity Overview" FontSize="18" Foreground="#888888" Margin="10,0,0,10"/>
-                <Calendar CalendarDayButtonStyle="{StaticResource CalendarDayButtonStyle}" Background="Transparent" Foreground="White" BorderThickness="0">
-                    <Calendar.Resources>
-                        <Style TargetType="CalendarItem">
-                            <Setter Property="Background" Value="Transparent"/>
-                        </Style>
-                    </Calendar.Resources>
-                </Calendar>
+                <TextBlock Text="Statistics" FontSize="18" Foreground="#888888" Margin="0,0,0,20"/>
+                
+                <TextBlock Text="Select Year" Foreground="#888888" Margin="0,0,0,5"/>
+                <ComboBox ItemsSource="{Binding AvailableYears}" SelectedItem="{Binding SelectedYear}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,0,15"/>
+
+                <TextBlock Text="Select Month" Foreground="#888888" Margin="0,0,0,5"/>
+                <ComboBox ItemsSource="{Binding AvailableMonths}" SelectedItem="{Binding SelectedMonth}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,0,30"/>
+                
+                <Border Background="#2c2c2c" CornerRadius="4" Padding="15">
+                    <StackPanel>
+                        <TextBlock Text="Days Worked" Foreground="#888888" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding DaysWorkedInSelectedMonth}" FontSize="48" FontWeight="Bold" Foreground="#42a5f5" HorizontalAlignment="Center" Margin="0,5"/>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </Border>
     </Grid>

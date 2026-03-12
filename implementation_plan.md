@@ -1,44 +1,68 @@
-# Implementation Plan - WPF Time Tracker & Pomodoro
+# Implementation Plan - WPF Time Tracker & Pomodoro (Modifications)
 
-This document outlines the design and implementation steps for a single-window WPF application that combines daily task tracking, a Pomodoro timer, and a monthly historical view.
+This document outlines the design and implementation steps for modifying the existing WPF application based on the new requirements.
+
+## Goal Description
+1. Remove the Pause button.
+2. Auto-start the timer if there is already time recorded for today when the app opens.
+3. Display the estimated time when the 8-hour workday finishes (`hh:mm:ss`), updated live.
+4. Add a workday completion sound, configurable like the Pomodoro sound, played when 8 hours are reached.
+5. Remove the calendar control and its associated logic.
+6. Add a Month and Year selector that displays the number of days worked in the selected month/year based on the saved text file.
+7. Auto-save the tracked time to the file every 5 minutes to prevent data loss.
+
+## User Review Required
+No critical concerns. The month selector will populate months that have recorded activity (or a static list of 1-12) to keep it simple. We will use a standard `ComboBox` for month selection.
 
 ## Proposed Changes
 
 ### Core Models & Services
 
-#### [NEW] `TaskEntry.cs`
-- Store `DateTime Date` and `TimeSpan TotalTime`.
-- Simple data holder for daily records.
-
-#### [NEW] `TaskService.cs`
-- Responsibility: Read and write task entries to a text file (`tasks.txt`).
-- Format: `yyyy-MM-dd | hh:mm:ss`. This keeps it human-readable and easy to parse.
-- Methods: `LoadAll()`, `Save(TaskEntry)`.
+#### [MODIFY] `TaskService.cs`
+- Add a method to get the number of days worked for a specific year and month to support the new UI feature.
+- Method signature: `int GetDaysWorkedInMonth(int year, int month)`.
 
 ### ViewModels
 
-#### [NEW] `MainViewModel.cs`
-- **Task Tracking State**: `IsRunning`, `IsPaused`, `CurrentTaskTime` (TimeSpan).
-- **Pomodoro State**: `PomodoroTimeLeft`, `ConfiguredPomodoroMinutes`, `IsPomodoroRunning`.
-- **Logic**: Use `DispatcherTimer` for ticking.
-- **Commands**: `StartTaskCommand`, `PauseTaskCommand`, `StopTaskCommand`, `StartPomodoroCommand`, `StopPomodoroCommand`.
-- **Sound Logic**: Integrate `System.Media.SoundPlayer` to play Windows `.wav` sounds.
+#### [MODIFY] `MainViewModel.cs`
+- **Timer Autostart**: In `LoadInitialData()`, if `CurrentTaskTime > TimeSpan.Zero`, automatically call `StartTask()`.
+- **Remove Pause**: Remove `PauseTaskCommand` and its associated methods.
+- **Estimated Finish Time**:
+  - Add property `WorkdayFinishTimeFormatted`.
+  - In `TaskTimer_Tick`, calculate: `DateTime.Now + (TimeSpan.FromHours(8) - CurrentTaskTime)`. If the time exceeds 8 hours, it can display "Finished" or the time it was completed.
+- **Workday Completion Sound**:
+  - Add `SelectedWorkdaySoundPath` property (similar to `SelectedSoundPath` for Pomodoro).
+  - Add a check in `TaskTimer_Tick` so that when `CurrentTaskTime.TotalHours` reaches exactly 8, it plays the selected sound.
+- **Auto-Save**:
+  - Create a dedicated `_autoSaveTimer` with a 5-minute interval that calls `_taskService.SaveOrUpdate()` while the task is running.
+- **Month & Year Selector & Stats**:
+  - Remove `HighlightedDays`.
+  - Add `ObservableCollection<string> AvailableMonths` and `ObservableCollection<int> AvailableYears`.
+  - Add `SelectedMonth` and `SelectedYear` properties. When either changes, update `DaysWorkedInSelectedMonth`.
+  - Add `DaysWorkedInSelectedMonth` property for the UI.
 
 ### User Interface
 
 #### [MODIFY] `MainWindow.xaml`
-- Use a `Grid` with two columns (left for controls/timers, right for the calendar).
-- **Task Section**: Large `TextBlock` for `hh:mm:ss`. Buttons for Start, Pause, Stop.
-- **Pomodoro Section**: `TextBlock` for countdown. Inputs for minutes and sound selection (from `C:\Windows\Media`).
-- **Calendar Section**: WPF `Calendar` control with custom styles to highlight days with tasks.
+- **Task Section**:
+  - Remove the "Pause" `<Button>`.
+  - Add a `<TextBlock>` below the timer to display `Estimated Finish: {Binding WorkdayFinishTimeFormatted}`.
+  - Add a `<ComboBox>` for the Workday Finish Sound, similar to the Pomodoro sound selector.
+- **Right Section (formerly Calendar)**:
+  - Remove `<Calendar>` and calendar-related resources.
+  - Add two `<ComboBox>` controls bound to `AvailableYears`/`SelectedYear` and `AvailableMonths`/`SelectedMonth`.
+  - Add a `<TextBlock>` displaying "Days worked this month: {Binding DaysWorkedInSelectedMonth}".
+
+#### [DELETE] `DateToHighlightConverter.cs` (or remove its usage)
+- Remove the `DateToHighlightConverter` class as the calendar is being removed.
 
 ## Verification Plan
 
 ### Automated Tests
-- None requested, but manual verification of timer precision will be done.
+- None requested.
 
 ### Manual Verification
-- **Timer Accuracy**: Start the timer and verify it increments every second.
-- **Persistence**: Stop a task, close the app, and check if `tasks.txt` contains the correct time.
-- **Pomodoro**: Set a 1-minute Pomodoro, wait for it to end, and verify the selected sound plays.
-- **Calendar**: Verify that days with saved time are visually distinct in the calendar.
+- **Auto-start**: Open the app with existing time in `tasks.txt` and verify the timer is running.
+- **Estimated Finish Time**: Verify the displayed estimated finish time is `Current Time + (8 hours - Recorded Time)`.
+- **Workday Sound**: Manually set the timer close to 8 hours and verify the selected sound plays when it hits 8 hours.
+- **Month Selector**: Select a month from the dropdown and verify the correct count of days worked is displayed based on `tasks.txt`.
