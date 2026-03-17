@@ -51,11 +51,11 @@
         <!-- Left Section: Timers -->
         <StackPanel Grid.Column="0">
             <!-- Daily Task Tracker -->
-            <Border Background="#1e1e1e" CornerRadius="8" Padding="20" Margin="0,0,0,20">
+            <Border Background="#1e1e1e" CornerRadius="8" Padding="10" Margin="0,0,0,20">
                 <StackPanel>
                     <TextBlock Text="Current Task" FontSize="18" Foreground="#888888" Margin="0,0,0,10"/>
-                    <TextBlock Text="{Binding TaskTimeFormatted}" FontSize="72" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10"/>
-                    <TextBlock Text="{Binding WorkdayFinishTimeFormatted}" FontSize="16" Foreground="#42a5f5" HorizontalAlignment="Center" Margin="0,0,0,20"/>
+                    <TextBlock Text="{Binding TaskTimeFormatted}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10"/>
+                    <TextBlock Text="{Binding WorkdayFinishTimeFormatted}" FontSize="18" Foreground="#42a5f5" HorizontalAlignment="Center" Margin="0,0,0,20"/>
                     
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,20">
                         <Button Content="Start" Command="{Binding StartTaskCommand}" Width="120" Background="#43a047"/>
@@ -78,7 +78,7 @@
             </Border>
 
             <!-- Pomodoro Section -->
-            <Border Background="#1e1e1e" CornerRadius="8" Padding="20">
+            <Border Background="#1e1e1e" CornerRadius="8" Padding="10">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -89,7 +89,7 @@
                         <TextBlock Text="Pomodoro" FontSize="18" Foreground="#888888" Margin="0,0,0,10"/>
                         <TextBlock Text="{Binding PomodoroTimeFormatted}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,10"/>
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="Start Pomodoro" Command="{Binding StartPomodoroCommand}" Width="150" Background="#1e88e5"/>
+                            <Button Content="Start" Command="{Binding StartPomodoroCommand}" Width="150" Background="#1e88e5"/>
                             <Button Content="Stop" Command="{Binding StopPomodoroCommand}" Width="100" Background="#e53935"/>
                         </StackPanel>
                     </StackPanel>
@@ -112,7 +112,7 @@
         </StackPanel>
 
         <!-- Right Section: Statistics -->
-        <Border Grid.Column="1" Background="#1e1e1e" CornerRadius="8" Padding="20" Margin="20,0,0,0">
+        <Border Grid.Column="1" Background="#1e1e1e" CornerRadius="8" Padding="10" Margin="20,0,0,0">
             <StackPanel>
                 <TextBlock Text="Statistics" FontSize="18" Foreground="#888888" Margin="0,0,0,20"/>
                 
