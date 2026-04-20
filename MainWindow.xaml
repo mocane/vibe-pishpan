@@ -7,7 +7,10 @@
         xmlns:viewmodels="clr-namespace:PishpanTimeTracker.ViewModels"
         xmlns:converters="clr-namespace:PishpanTimeTracker.Converters"
         mc:Ignorable="d"
-        Title="Pishpan Time Tracker" Height="700" Width="400"
+        Title="Pishpan Time Tracker"
+        SizeToContent="Height"
+        MinHeight="300"
+        Width="300"
         Background="#121212" Foreground="White" FontFamily="Segoe UI">
     <Window.DataContext>
         <viewmodels:MainViewModel/>
@@ -43,86 +46,94 @@
     </Window.Resources>
 
     <Grid Margin="10">
-        <!-- Left Section: Timers -->
-        <StackPanel Grid.Column="0">
-            <!-- Daily Task Tracker -->
-            <Border Background="#1e1e1e" CornerRadius="4" Padding="5" Margin="0,0,0,10">
-                <StackPanel>
-                    <TextBlock Text="{Binding TaskTimeFormatted}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,5"/>
-                    <TextBlock Text="{Binding WorkdayFinishTimeFormatted}" FontSize="18" Foreground="#42a5f5" HorizontalAlignment="Center" Margin="0,0,0,10"/>
-                    
-                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
-                        <Button Content="Start" Command="{Binding StartTaskCommand}" Width="60" Background="#43a047"/>
-                        <Button Content="Stop" Command="{Binding StopTaskCommand}" Width="60" Background="#e53935"/>
-                    </StackPanel>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/> <!-- Daily -->
+            <RowDefinition Height="Auto"/> <!-- Pomodoro -->
+            <RowDefinition Height="Auto"/> <!-- Bottom -->
+          </Grid.RowDefinitions>
+  
+        <!-- Daily Task Tracker -->
+        <Border Grid.Row="0" Background="#1e1e1e" CornerRadius="4" Padding="5" Margin="0,0,0,10">
+            <StackPanel>
+                <TextBlock Text="{Binding TaskTimeFormatted}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,5"/>
+                <TextBlock Text="{Binding WorkdayFinishTimeFormatted}" FontSize="18" Foreground="#42a5f5" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
+                    <Button Content="Start" Command="{Binding StartTaskCommand}" Width="60" Background="#43a047"/>
+                    <Button Content="Stop" Command="{Binding StopTaskCommand}" Width="60" Background="#e53935"/>
+                </StackPanel>
 
-                    <Separator Background="#333333" Margin="0,5"/>
-                    
+                <Separator Background="#333333" Margin="0,5"/>
+                
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center"><!-- make it a grid-->
+                    <TextBlock Text="Workday Sound" Foreground="#888888" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                    <ComboBox ItemsSource="{Binding AvailableSounds}" SelectedItem="{Binding SelectedWorkdaySoundPath}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource FileNameConverter}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <!-- Pomodoro Section -->
+        <Expander Grid.Row="1" Header="Pomodoro" IsExpanded ="False" Background="#1e1e1e" Padding="5" Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0">
+                    <TextBlock Text="Pomodoro" FontSize="18" Foreground="#888888" Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding PomodoroTimeFormatted}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,5"/>
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                        <TextBlock Text="Workday Sound" Foreground="#888888" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <ComboBox ItemsSource="{Binding AvailableSounds}" SelectedItem="{Binding SelectedWorkdaySoundPath}" Width="200" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Converter={StaticResource FileNameConverter}}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
+                        <Button Content="Start" Command="{Binding StartPomodoroCommand}" Width="60" Background="#1e88e5"/>
+                        <Button Content="Stop" Command="{Binding StopPomodoroCommand}" Width="60" Background="#e53935"/>
                     </StackPanel>
                 </StackPanel>
-            </Border>
 
-            <!-- Pomodoro Section -->
-            <Border Background="#1e1e1e" CornerRadius="4" Padding="5" Margin="0,0,0,10">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="1" Margin="10,0,0,0" Width="200">
+                    <TextBlock Text="Duration (min)" Foreground="#888888" Margin="0,0,0,5"/>
+                    <TextBox Text="{Binding PomodoroDurationMinutes, UpdateSourceTrigger=PropertyChanged}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,0,15"/>
                     
-                    <StackPanel Grid.Column="0">
-                        <TextBlock Text="Pomodoro" FontSize="18" Foreground="#888888" Margin="0,0,0,5"/>
-                        <TextBlock Text="{Binding PomodoroTimeFormatted}" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,5"/>
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                            <Button Content="Start" Command="{Binding StartPomodoroCommand}" Width="60" Background="#1e88e5"/>
-                            <Button Content="Stop" Command="{Binding StopPomodoroCommand}" Width="60" Background="#e53935"/>
-                        </StackPanel>
-                    </StackPanel>
+                    <TextBlock Text="Sound" Foreground="#888888" Margin="0,0,0,5"/>
+                    <ComboBox ItemsSource="{Binding AvailableSounds}" SelectedItem="{Binding SelectedSoundPath}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Converter={StaticResource FileNameConverter}}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                </StackPanel>
+            </Grid>
+        </Expander>
 
-                    <StackPanel Grid.Column="1" Margin="10,0,0,0" Width="200">
-                        <TextBlock Text="Duration (min)" Foreground="#888888" Margin="0,0,0,5"/>
-                        <TextBox Text="{Binding PomodoroDurationMinutes, UpdateSourceTrigger=PropertyChanged}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,0,15"/>
-                        
-                        <TextBlock Text="Sound" Foreground="#888888" Margin="0,0,0,5"/>
-                        <ComboBox ItemsSource="{Binding AvailableSounds}" SelectedItem="{Binding SelectedSoundPath}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5">
-                            <ComboBox.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Converter={StaticResource FileNameConverter}}"/>
-                                </DataTemplate>
-                            </ComboBox.ItemTemplate>
-                        </ComboBox>
-                    </StackPanel>
-                </Grid>
-            </Border>
-
-            <!-- Bottom Section: Statistics -->
-            <Border Background="#1e1e1e" CornerRadius="4" Padding="5" Margin="0,0,0,10">
-                <StackPanel>
-                    <TextBlock Text="Statistics" FontSize="18" Foreground="#888888" Margin="0,0,0,10"/>
-                    
+        <!-- Bottom Section: Statistics -->
+        <Expander Grid.Row="2" Header="Statistics" IsExpanded ="False" Background="#1e1e1e" Padding="5" Margin="0,0,0,10">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                
+                <StackPanel Grid.Column="0" Margin="0,0,0,10">
                     <TextBlock Text="Select Year" Foreground="#888888" Margin="0,0,0,5"/>
-                    <ComboBox ItemsSource="{Binding AvailableYears}" SelectedItem="{Binding SelectedYear}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,0,15"/>
+                    <ComboBox ItemsSource="{Binding AvailableYears}" SelectedItem="{Binding SelectedYear}" Width="100" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,0,5"/>
 
                     <TextBlock Text="Select Month" Foreground="#888888" Margin="0,0,0,5"/>
-                    <ComboBox ItemsSource="{Binding AvailableMonths}" SelectedItem="{Binding SelectedMonth}" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,0,30"/>
-                    
-                    <Border Background="#2c2c2c" CornerRadius="4" Padding="5">
-                        <StackPanel>
-                            <TextBlock Text="Days Worked" Foreground="#888888" HorizontalAlignment="Center"/>
-                            <TextBlock Text="{Binding DaysWorkedInSelectedMonth}" FontSize="48" FontWeight="Bold" Foreground="#42a5f5" HorizontalAlignment="Center" Margin="0,5"/>
-                        </StackPanel>
-                    </Border>
+                    <ComboBox ItemsSource="{Binding AvailableMonths}" SelectedItem="{Binding SelectedMonth}" Width="100" Background="#2c2c2c" Foreground="White" BorderThickness="0" Padding="5" Margin="0,0,0,5"/>
                 </StackPanel>
-            </Border>
-        </StackPanel>
+
+                <Border Grid.Column="1" Background="#2c2c2c" CornerRadius="4" Padding="5">
+                    <StackPanel>
+                        <TextBlock Text="Days Worked" Foreground="#888888" HorizontalAlignment="Center"/>
+                        <TextBlock Text="{Binding DaysWorkedInSelectedMonth}" FontSize="48" FontWeight="Bold" Foreground="#42a5f5" HorizontalAlignment="Center" Margin="0,5"/>
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Expander>
     </Grid>
 </Window>
