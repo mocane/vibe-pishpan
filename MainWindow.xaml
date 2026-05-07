@@ -60,6 +60,7 @@
                 
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,10">
                     <Button Content="Start" Command="{Binding StartTaskCommand}" Width="60" Background="#43a047"/>
+                    <Button Content="+5 min" Command="{Binding AddFiveMinutesCommand}" Width="60" Background="#2196f3"/>
                     <Button Content="Stop" Command="{Binding StopTaskCommand}" Width="60" Background="#e53935"/>
                 </StackPanel>
 

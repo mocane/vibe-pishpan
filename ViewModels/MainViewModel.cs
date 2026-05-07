@@ -49,6 +49,7 @@ namespace PishpanTimeTracker.ViewModels
 
             StartPomodoroCommand = new RelayCommand(_ => StartPomodoro(), _ => !IsPomodoroRunning);
             StopPomodoroCommand = new RelayCommand(_ => StopPomodoro(), _ => IsPomodoroRunning);
+            AddFiveMinutesCommand = new RelayCommand(_ => AddFiveMinutes());
 
             LoadInitialData();
             LoadAvailableSounds();
@@ -151,6 +152,7 @@ namespace PishpanTimeTracker.ViewModels
         public ICommand StartPomodoroCommand { get; }
         public ICommand StopPomodoroCommand { get; }
         public ICommand StopTaskCommand { get; }
+        public ICommand AddFiveMinutesCommand { get; }
 
         private void LoadInitialData()
         {
@@ -248,6 +250,12 @@ namespace PishpanTimeTracker.ViewModels
         {
             _taskService.SaveOrUpdate(new TaskEntry { Date = DateTime.Today, TotalTime = CurrentTaskTime });
             UpdateDaysWorked();
+        }
+
+        private void AddFiveMinutes()
+        {
+            CurrentTaskTime = CurrentTaskTime.Add(TimeSpan.FromMinutes(5));
+            SaveTask();
         }
 
         private void StartPomodoro()
